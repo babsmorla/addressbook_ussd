@@ -1,0 +1,26 @@
+# RVM
+.ruby-version
+.ruby-gemset
+
+# Claude
+CLAUDE.md
+
+# Bundler
+vendor/bundle
+.bundle/
+
+# Logs
+*.log
+log/
+
+# Environment
+.env
+.env.*
+
+# Temp / OS
+tmp/*
+!tmp/.gitkeep
+.DS_Store
+
+# Gemfile.lock
+Gemfile.lock
