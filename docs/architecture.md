@@ -387,7 +387,10 @@ store_data(network: 'MTN')
 
 This is the primary way pages pass data forward through a multi-step flow.
 
-**Optional data threading:** All three base classes (`Menu::Base`, `Page::Base`, `Service::Base`) accept an optional `data` argument. When passed, the object uses it directly instead of fetching from Redis — useful for avoiding a round-trip when you already have `@data` in memory. Golden rule: **only pass `@data` to objects that won't call `store_data`**. If a service writes, omit the argument, then call `fetch_data` after it returns to resync your local state before passing it to the next page.
+**Optional data threading:** All three base classes (`Menu::Base`, `Page::Base`, `Service::Base`) accept an optional `data` argument. This allows you to "thread" the session state forward through your controller without hitting Redis.
+
+> [!CAUTION]
+> **The Sync Rule:** If you call a service that calls `store_data` (writes to Redis), your local `@data` becomes stale. You **MUST** call `fetch_data` immediately after the service call before passing `@data` to the next page to ensure the next page does not overwrite the service's changes.
 
 ```ruby
 # read-only service — safe to pass @data
@@ -395,8 +398,8 @@ items = Service::Base.new(@params, @data).entity_items
 
 # writing service — let it fetch, then reload
 Service::Gen.process(:name_lookup, @params)   # no data arg
-fetch_data                                    # resync @data from Redis
-Page::Gen::Summary.process(@params.merge(activity_type: REQUEST), @data)
+fetch_data                                    # reload fresh name from Redis
+Page::Gen::Summary.process(@params.merge(activity_type: REQUEST), @data) # pass synced @data
 ```
 
 **Display Logging:** Both `continue()` and `end_session()` log what the user sees on their phone:
