@@ -107,7 +107,7 @@ ussd-ruby-template/
 │   │       └── summary.rb        # Page::Gen::Summary — confirm & pay
 │   │
 │   └── service/                  # Business logic layer
-│       ├── base.rb               # Service::Base — process(action, params) pattern
+│       ├── base.rb               # Service::Base — process(action, params, data = nil) pattern
 │       └── gen.rb                # Service::Gen — make_payment via ExternalApi
 │
 ├── log/                          # Runtime logs (gitignored)
@@ -387,6 +387,18 @@ store_data(network: 'MTN')
 
 This is the primary way pages pass data forward through a multi-step flow.
 
+**Optional data threading:** All three base classes (`Menu::Base`, `Page::Base`, `Service::Base`) accept an optional `data` argument. When passed, the object uses it directly instead of fetching from Redis — useful for avoiding a round-trip when you already have `@data` in memory. Golden rule: **only pass `@data` to objects that won't call `store_data`**. If a service writes, omit the argument, then call `fetch_data` after it returns to resync your local state before passing it to the next page.
+
+```ruby
+# read-only service — safe to pass @data
+items = Service::Base.new(@params, @data).entity_items
+
+# writing service — let it fetch, then reload
+Service::Gen.process(:name_lookup, @params)   # no data arg
+fetch_data                                    # resync @data from Redis
+Page::Gen::Summary.process(@params.merge(activity_type: REQUEST), @data)
+```
+
 **Display Logging:** Both `continue()` and `end_session()` log what the user sees on their phone:
 
 ```
@@ -404,7 +416,7 @@ The **switchboard**. On every `msg_type: '1'` request:
 2. Extracts the `function` key (e.g. `'make_payment'`).
 3. **Extracts `activity_type`** from the tracker and merges it into `@params`.
 4. Looks up the page class from the `MENU_MANAGER` hash.
-5. Calls `PageClass.process(params)`.
+5. Calls `PageClass.process(params)` (or `PageClass.process(params, data)` when the caller already holds the session hash).
 
 > **Critical:** `Menu::Manager` must pass `activity_type` from the tracker into `@params`. Without this, `Page::Base#process` receives `nil` for `@activity_type` and crashes silently.
 
@@ -558,7 +570,7 @@ class Gen < Service::Base
 end
 ```
 
-**Pattern:** `Service::Base.process(action, params)` uses `send(action)` to call the named method. Errors are caught and logged automatically — the caller receives `nil` on any failure.
+**Pattern:** `Service::Base.process(action, params, data = nil)` uses `send(action)` to call the named method. Errors are caught and logged automatically — the caller receives `nil` on any failure. Pass `data` only when the service is **read-only** and you want to skip a Redis round-trip. If the service calls `store_data` internally, omit `data` and call `fetch_data` in the caller afterward (see [Common Pitfalls](#common-pitfalls)).
 
 ---
 
@@ -1142,6 +1154,8 @@ process_payment runs
 | Navigation crashes silently | `Menu::Manager` doesn't pass `activity_type` from tracker to `@params` | Always merge `activity_type: tracker[:activity_type]` in `Menu::Manager#process` |
 | MTN payments silently fail | MoMo prompt arrives while MTN USSD session is still open | `sleep 3` inside the payment thread when `network == 'MTN'` |
 | Payment exception disappears | `raise` inside unjoined thread — Ruby discards it | `rescue StandardError` in the thread, log + send failure SMS |
+| Data written by a service disappears before the next page renders | `with_indifferent_access` creates a copy of `@data`; the service's `store_data` mutates its own copy and writes to Redis, but the caller's `@data` is still stale. Passing that stale hash to the next page causes its `store_data` (called inside `render_page`) to overwrite Redis and drop what the service wrote. | After any service call that writes data, call `fetch_data` in the caller to reload `@data` from Redis before passing it onward. Alternatively, don't pass `@data` to services that write — let them fetch independently. |
+| `NoMethodError` on item selection | Assigning `selected_item: selected_item` where `selected_item` is treated as a method call, not a local variable | Always assign to a local variable first: `item = paged[index]`, then use `item` in the hash |
 | "Extensions not built" on `bundle` | Ruby version changed, native gems need recompiling | `bundle config set --local path 'vendor/bundle'` then `bundle install` |
 | Permission denied on `bundle install` | Trying to install to system gems | `bundle config set --local path 'vendor/bundle'` |
 | BACK button goes to wrong page | Hardcoded `'0'` instead of constant `BACK` | Use `when BACK then ...` with `BACK = '00'` |

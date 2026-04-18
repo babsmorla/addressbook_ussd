@@ -6,16 +6,16 @@ module Menu
     include ::Formatters rescue nil
     include ::Pagination rescue nil
 
-    def initialize(params)
+    def initialize(params, data = nil)
       @params = params
       @mobile_number = params[:msisdn]
       @ussd_body = params[:ussd_body]
       @session_id = params[:session_id]
       @activity_type = params[:activity_type]
       @message_append = params[:message_append]
-      @message_prepend = params[:message_prepend].to_s || ''
+      @message_prepend = params[:message_prepend].to_s
       @end_session = false
-      fetch_data
+      data ? @data = (data.is_a?(Hash) ? data.with_indifferent_access : {}) : fetch_data
     end
 
     def fetch_data

@@ -12,8 +12,8 @@ module Service
   # any error, logging it and returning nil so the caller can gracefully
   # end the session.
   class Base < Menu::Base
-    def self.process(action, params = {})
-      new(params).send(action)
+    def self.process(action, params = {}, data = nil)
+      new(params, data).send(action)
     rescue StandardError => e
       LOGGER.error("[Service::#{name.split('::').last}] Action: #{action} — #{e.message}\n#{e.backtrace[0..3].join("\n")}")
       nil

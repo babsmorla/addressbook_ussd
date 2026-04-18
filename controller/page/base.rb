@@ -2,8 +2,8 @@
 
 module Page
   class Base < Menu::Base
-    def self.process(params)
-      new(params).process
+    def self.process(params, data = nil)
+      new(params, data).process
     end
 
     def process
