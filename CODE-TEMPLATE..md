@@ -15,7 +15,7 @@ Use this file as the quick project footprint for building a similar app, especia
 
 ## Runtime Contract
 
-Incoming JSON:
+Incoming JSON: 
 
 ```json
 {

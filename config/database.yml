@@ -1,7 +1,7 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: address_book_development
+  database: addressbook_ussd_development
 <% if ENV['DB_HOST'] %>
   host: <%= ENV['DB_HOST'] %>
 <% end %>
