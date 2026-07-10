@@ -3,6 +3,10 @@ module Validations
     quantity.is_a?(Numeric) && quantity > 0
   end
 
+  def valid_amount?(amount)
+    valid_number?(amount.to_f)
+  end
+
   def valid_phone_number_format?(number)
     number.match?(/^(0|233)\d{9}$/)
   end

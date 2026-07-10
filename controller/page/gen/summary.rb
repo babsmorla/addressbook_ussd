@@ -9,7 +9,8 @@ module Page
 
       def process_response
         case @ussd_body
-        when CONFIRM then process_payment
+        #when CONFIRM then process_payment
+        when CONFIRM then Page::Gen::Last.process(@params.merge(activity_type: REQUEST))
         when BACK    then Page::Gen::Payment.process(@params.merge(activity_type: REQUEST))
         else              invalid_input
         end

@@ -1,0 +1,24 @@
+{
+  "name": "ussd_template_anm",
+  "version": "1.0.0",
+  "description": "This is a standardized Ruby/Sinatra template for building high-performance USSD gateways for the Apps-N-Mobile ecosystem.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appsnmobile-solutions/ussd_template_anm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/appsnmobile-solutions/ussd_template_anm/issues"
+  },
+  "homepage": "https://github.com/appsnmobile-solutions/ussd_template_anm#readme"
+}

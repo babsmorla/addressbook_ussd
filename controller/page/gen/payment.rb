@@ -11,7 +11,7 @@ module Page
         case @ussd_body
         when BACK then Page::Gen::MainMenu.process(@params.merge(activity_type: REQUEST))
         else
-          return invalid_input('amount') unless Util::Validation.valid_amount?(@ussd_body)
+          return invalid_input('amount') unless valid_amount?(@ussd_body)
 
           store_data(amount: @ussd_body)
           Page::Gen::Summary.process(@params.merge(activity_type: REQUEST))

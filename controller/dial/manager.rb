@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 module Dial
-  class Manager
+    class Manager
     def initialize(json)
-      @params       = JSON.parse(json)&.with_indifferent_access
+      @params       = parse_payload(json)
       @message_type = @params[:msg_type]
       @mobile_number = @params[:msisdn]
       @ussd_body    = @params[:ussd_body]
     end
 
     def process
+      return invalid_request if @params[:invalid_payload]
+
       LOGGER.info("[Dial::Manager] MSISDN: #{@mobile_number} — Type: #{@message_type} — Body: #{@ussd_body}")
 
       case @message_type
@@ -25,6 +27,16 @@ module Dial
     end
 
     private
+
+    def parse_payload(json)
+      JSON.parse(json.to_s).with_indifferent_access
+    rescue JSON::ParserError, TypeError
+      { invalid_payload: true }.with_indifferent_access
+    end
+
+    def invalid_request
+      Session::Manager.end(@params.merge(display_message: 'Invalid request payload.'))
+    end
 
     def first_dial
       # Check for a resumable session first
@@ -54,8 +66,7 @@ module Dial
     end
 
     def release
-      $redis.del("#{@params[:session_id]}-#{@mobile_number}-cache")
-      $redis.del("#{@mobile_number}-last-session")
+      Cache.reset_session_state(@mobile_number)
       Session::Manager.end(@params.merge(display_message: ''))
     end
   end

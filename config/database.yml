@@ -1,0 +1,24 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: address_book_development
+<% if ENV['DB_HOST'] %>
+  host: <%= ENV['DB_HOST'] %>
+<% end %>
+  username: <%= ENV.fetch('DB_USER', ENV['USER']) %>
+  password: <%= ENV.fetch('DB_PASSWORD', '') %>
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: address_book_test
+<% if ENV['DB_HOST'] %>
+  host: <%= ENV['DB_HOST'] %>
+<% end %>
+  username: <%= ENV.fetch('DB_USER', ENV['USER']) %>
+  password: <%= ENV.fetch('DB_PASSWORD', '') %>
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  url: <%= ENV['DATABASE_URL'] %>

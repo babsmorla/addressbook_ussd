@@ -3,7 +3,7 @@ source "https://rubygems.org/"
 
 gem 'sinatra', '~> 2.2'
 gem 'sinatra-activerecord'
-gem 'pg', '1.5.4'
+gem 'pg', '1.6'
 gem 'puma'
 gem 'rake'
 gem 'redis'

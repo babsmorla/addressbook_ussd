@@ -8,7 +8,7 @@ module Menu
 
     def process
       tracker = @data[:tracker]
-      function = tracker ? tracker[:function] : WELCOME
+      function = tracker ? tracker[:function] : MAINMENU
       activity_type = tracker ? tracker[:activity_type] : REQUEST
 
       MENU_MANAGER[function].process(

@@ -65,5 +65,28 @@ class Cache
     $redis.set("#{msisdn}-last-session", new_session_id, ex: 300)
     LOGGER.info("[Cache] Migrated previous session for #{msisdn} → #{new_session_id}")
   end
+
+
+  # ================================================
+  # Confirm later on this code
+  # ================================================
+  # Remove the resume pointer so the next start is treated as a fresh session.
+  def self.clear_previous_session(msisdn)
+    old_session_id = $redis.get("#{msisdn}-last-session")
+    return if old_session_id.nil?
+
+    $redis.del("#{msisdn}-last-session")
+    $redis.del("#{old_session_id}-#{msisdn}-cache")
+    $redis.del("#{msisdn}-cache")
+    LOGGER.info("[Cache] Cleared previous session pointer for #{msisdn}")
+  end
+
+  # Fully reset all cached session state for a phone number.
+  def self.reset_session_state(msisdn)
+    clear_previous_session(msisdn)
+    $redis.del("#{msisdn}-last-session")
+    $redis.keys("*-#{msisdn}-cache").each { |key| $redis.del(key) }
+    LOGGER.info("[Cache] Reset all session state for #{msisdn}")
+  end
 end
 

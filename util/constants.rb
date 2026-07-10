@@ -19,11 +19,21 @@ CONFIRM = '1'    # Summary pages: confirm and proceed
 MAINMENU             = 'main_menu'
 MAKE_PAYMENT         = 'make_payment'
 MAKE_PAYMENT_SUMMARY = 'make_payment_summary'
+MAKE_PAYMENT_LAST    = 'make_payment_last'
+ADD_CONTACT_NAME     = 'add_contact_name'
+ADD_CONTACT_PHONE    = 'add_contact_phone'
+ADD_CONTACT_SUMMARY  = 'add_contact_summary'
+CONTACT_LIST         = 'contact_list'
+CONTACT_DETAILS      = 'contact_details'
+EDIT_CONTACT_MENU    = 'edit_contact_menu'
+EDIT_CONTACT_NAME    = 'edit_contact_name'
+EDIT_CONTACT_PHONE   = 'edit_contact_phone'
+DELETE_CONTACT       = 'delete_contact'
 CONTACT_US           = 'contact_us'
 RESUME_SESSION       = 'resume_session'
 
 # ── User Messages ─────────────────────────────────────────────────────────────
-THANK_YOU = 'Thank you for using our service. Please wait for your payment prompt.'
+THANK_YOU = 'Thank you for using Address Book.'
 
 # ── API ───────────────────────────────────────────────────────────────────────
 BASE_URL             = 'http://localhost:3000/api/v1'
@@ -46,7 +56,7 @@ NETWORKS = [
 ].freeze
 
 # ── App Info (OVERRIDE THESE PER PROJECT) ────────────────────────────────────
-APP_NAME      = 'USSD Template'
+APP_NAME      = 'Address Book'
 CURRENCY      = 'GHS'
 COUNTRY_CODE  = 'GH'
 SUPPORT_PHONE = '+233 00 000 0000'
