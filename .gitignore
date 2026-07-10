@@ -24,3 +24,9 @@ tmp/*
 
 # Gemfile.lock
 Gemfile.lock
+
+node_modules/
+*.log
+.env
+tmp/
+*:Zone.Identifier
